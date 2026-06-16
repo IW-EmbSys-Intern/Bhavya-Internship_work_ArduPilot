@@ -28,7 +28,8 @@ setup(
             "draw_circle = my_robot_controller.draw_circle:main",
             "pose_subscriber584 = my_robot_controller.pose_subscriber:main",
             "turtle_controller = my_robot_controller.turtle_controller:main",
-            "turtlebot_info = my_robot_controller.turtlebot_info:main"
+            "turtlebot_info = my_robot_controller.turtlebot_info:main",
+            "keyboard_teleop = my_robot_controller.keyboard_teleop:main"
         ],
     },
 )
