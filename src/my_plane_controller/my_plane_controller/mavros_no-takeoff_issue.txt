@@ -1,0 +1,146 @@
+✈️ Problem Summary (What you observed)
+
+You built a ROS2 + MAVROS + ArduPilot Plane mission:
+
+Mission uploaded successfully ✔
+Mode changed to AUTO ✔
+Vehicle armed ✔
+No movement initially ❌
+Later: sometimes no takeoff ❌
+Finally: aircraft started flying ✔ only after changing mission item types
+
+So the confusion was:
+
+“Everything is accepted, but the plane does not move or take off.”
+
+🧠 Root Cause (Main issue)
+
+The core issue was NOT ROS2 or MAVROS.
+
+It was:
+
+❗ Incorrect understanding of ArduPilot Plane mission command semantics (16 vs 22)
+
+🚨 Key misunderstanding
+
+You initially used:
+
+16 = NAV_WAYPOINT for all mission points
+
+You assumed:
+
+“AUTO + ARM + waypoints = plane will takeoff and fly”
+
+But in ArduPilot Plane:
+
+❌ This is wrong because:
+16 assumes aircraft is already airborne
+It does NOT trigger takeoff behavior
+✈️ Why the plane did not move initially
+
+Even though everything was successful:
+
+Mission uploaded ✔
+AUTO mode ✔
+ARM ✔
+
+The aircraft stayed still because:
+
+There was no flight state transition trigger
+
+So ArduPilot remained in:
+
+ARMED + AUTO + WAITING_FOR_FLIGHT_STATE
+🚀 First partial fix attempt (what you tried)
+
+You added:
+
+22 = NAV_TAKEOFF in mission
+
+But results were inconsistent:
+
+22 in middle → worked ✔
+22 at first position → did NOT work ❌
+🧠 Why that happened
+✔ Why 22 in middle worked
+
+Because:
+
+Aircraft enters mission safely using 16
+Then reaches a valid flight-ready state
+Then 22 triggers takeoff logic successfully
+❌ Why 22 at first position failed
+
+Because:
+
+Plane was not yet in a stable mission execution state
+EKF / navigation / mission pointer not fully initialized
+ArduPilot blocks immediate launch if state not ready
+
+👉 So TAKEOFF requires a valid mission + nav-ready state first
+
+🔥 Final correct understanding
+
+ArduPilot Plane uses a state machine, not simple waypoint execution.
+
+Command	Meaning
+16	Fly to waypoint (requires airborne state)
+22	Transition from ground → air (takeoff state trigger)
+21	Transition from air → ground (landing)
+✅ Final working solution
+
+Your working mission became:
+
+16 → 22 → 16 → 16
+Why this works:
+16 → establishes mission entry safely
+22 → triggers takeoff state machine
+remaining 16 → normal navigation in air
+📌 Important fixes you also applied
+✔ 1. Fixed MAVROS WaypointPush response handling
+Removed invalid success_count
+Used correct response fields (wp_transfered / success)
+✔ 2. Ensured waypoint activation behavior
+Mission upload alone is not enough
+AUTO mode does NOT guarantee start
+Proper mission sequencing matters
+✔ 3. Corrected mission interpretation
+Realized 16 ≠ takeoff-capable command
+Realized 22 is a state trigger, not just a waypoint
+⚠️ Important lessons learned
+1. ROS success ≠ flight success
+
+Even if all services return OK, aircraft may still not move.
+
+2. ArduPilot Plane is state-machine based
+
+It is NOT:
+
+“execute waypoint list”
+
+It is:
+
+“execute flight state transitions based on mission commands”
+
+3. Mission item order matters more than expected
+22 cannot reliably be first
+16 alone cannot start flight
+sequence defines behavior
+4. TAKEOFF is not movement — it is a state transition
+
+It:
+
+enables throttle
+enables pitch-up
+switches flight phase
+5. Debugging must move layer-by-layer
+
+You correctly went through:
+
+ROS/MAVROS issues ✔
+mission upload ✔
+mode/arming ✔
+finally mission semantics ✔
+🧾 Final “one-line summary for notes”
+
+The issue was not ROS2 or MAVROS, but incorrect ArduPilot Plane mission semantics: NAV_WAYPOINT (16) does not trigger takeoff, and NAV_TAKEOFF (22) only works as a flight-state transition when reached in a valid mission execution state, not as the first mission item.

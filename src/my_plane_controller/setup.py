@@ -25,7 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'circle = my_plane_controller.circle:main',
-            'takeoff_mavros = my_plane_controller.takeoff_using_mavros:main'
+            'takeoff_mavros = my_plane_controller.takeoff_using_mavros:main',
+            'takeoff_mavros2 = my_plane_controller.takeoff_using_mavros2:main'
         ],
     },
 )
