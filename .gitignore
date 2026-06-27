@@ -1,0 +1,14 @@
+build/
+install/
+log/
+resource/
+__pycache__
+.vscode/
+*.vc.db
+.vscode/
+*.vc.db
+*.vc.db-shm
+*.vc.db-wal
+microsoft.gpg
+__pycache__/
+*.pyc
