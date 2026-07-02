@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 
 from mavros_msgs.srv import CommandBool, SetMode, WaypointPush, WaypointClear
 from mavros_msgs.msg import Waypoint, State
 from mavros_msgs.srv import WaypointSetCurrent
-from geographic_msgs.msg import GeoPoseStamped
 
 import math
 
@@ -18,6 +19,7 @@ class PlaneMission(Node):
         self.mode_client = self.create_client(SetMode, '/mavros/set_mode')
         self.wp_clear_client = self.create_client(WaypointClear, '/mavros/mission/clear')
         self.wp_push_client = self.create_client(WaypointPush, '/mavros/mission/push')
+        self.wp_set_current_client = self.create_client(WaypointSetCurrent, '/mavros/mission/set_current')
 
         # state
         self.timer = self.create_timer(2.0, self.run_once)
@@ -31,26 +33,13 @@ class PlaneMission(Node):
 
         # FCU state
         self.current_state = None
-        self.state_sub = self.create_subscription(
-            State,
-            '/mavros/state',
-            self.state_cb,
-            10
-        )
-        self.wp_set_current_client = self.create_client(
-            WaypointSetCurrent,
-            '/mavros/mission/set_current'
-        )
+        self.state_sub = self.create_subscription(State, '/mavros/state', self.state_cb, 10)
 
         self.get_logger().info("Waiting for MAVROS services...")
         self.arm_client.wait_for_service()
         self.mode_client.wait_for_service()
         self.wp_clear_client.wait_for_service()
         self.wp_push_client.wait_for_service()
-
-        # fake home
-        self.home_lat = -35.36325846
-        self.home_lon = 149.16523276
 
     # -------------------------
     # utilities
@@ -84,32 +73,31 @@ class PlaneMission(Node):
     # mission builder
     # -------------------------
     def build_mission(self):
-        alt = 100.0
+        alt = 20.0
 
         p0 = (0, 0)
-        p1 = (100, 0)
-        p2 = (300, 300)
-        center = (50, 50)
-        p3 = (150, 150)
-        p4 = (100, 100)
-        p5 = (50, 50)
+        # p1 = (100, 0)
+        # p2 = (300, 300)
+        # center = (50, 50)
+        # p3 = (150, 150)
+        # p4 = (100, 100)
+        # p5 = (50, 50)
 
         lat0, lon0 = self.meters_to_latlon(*p0)
-        lat1, lon1 = self.meters_to_latlon(*p1)
-        lat2, lon2 = self.meters_to_latlon(*p2)
-        latc, lonc = self.meters_to_latlon(*center)
-        lat3, lon3 = self.meters_to_latlon(*p3)
-        lat4, lon4 = self.meters_to_latlon(*p4)
-        lat5, lon5 = self.meters_to_latlon(*p5)
+        # lat1, lon1 = self.meters_to_latlon(*p1)
+        # lat2, lon2 = self.meters_to_latlon(*p2)
+        # latc, lonc = self.meters_to_latlon(*center)
+        # lat3, lon3 = self.meters_to_latlon(*p3)
+        # lat4, lon4 = self.meters_to_latlon(*p4)
+        # lat5, lon5 = self.meters_to_latlon(*p5)
 
         self.mission = [
             self.create_wp(lat0, lon0, alt, 16),  # waypoint
-            self.create_wp(lat1, lon1, alt, 22),
-            self.create_wp(lat2, lon2, alt, 16),
-            self.create_wp(latc, lonc, alt, 16),
-            self.create_wp(lat3, lon3, alt, 16),
-            self.create_wp(lat4, lon4, alt, 21),
-            self.create_wp(lat5, lon5, alt, 16),
+            self.create_wp(-35.36294750, 149.16514130, alt, 22),
+            self.create_wp(-35.36240853, 149.16523768, alt, 16),
+            self.create_wp(-35.35955641, 149.16516876, alt, 16),
+            self.create_wp(-35.35863563, 149.16514122, alt, 16),
+            self.create_wp(-35.35907356, 149.16185051, alt, 21),
         ]
 
         self.mission[0].is_current = True
@@ -122,7 +110,7 @@ class PlaneMission(Node):
         if self.done:
             return
 
-        # STEP 0: clear mission
+        # STEP 0: clear old mission
         if self.step == 0:
             self.get_logger().info("Clearing mission...")
             self.wp_clear_client.call_async(WaypointClear.Request())
@@ -145,6 +133,7 @@ class PlaneMission(Node):
             self.get_logger().info(f"Mission uploaded: {len(self.mission)} WPs")
             return
 
+        # STEP 1.5: Check upload status
         if self.step == 1.5:
             if self.wp_future is None or not self.wp_future.done():
                 return
@@ -161,10 +150,9 @@ class PlaneMission(Node):
             self.get_logger().info("MISSION UPLOADED SUCCESSFULLY")
             self.step = 2
             return
-
+ 
         # STEP 2: set AUTO mode (async)
         if self.step == 2:
-
             if self.current_state and not self.current_state.connected:
                 self.get_logger().warn("Waiting for FCU connection...")
                 return
@@ -180,7 +168,6 @@ class PlaneMission(Node):
 
         # STEP 2.5: check AUTO result
         if self.step == 2.5:
-
             if self.mode_future is None or not self.mode_future.done():
                 return
 
@@ -210,7 +197,6 @@ class PlaneMission(Node):
 
         # STEP 3.5: check arm result
         if self.step == 3.5:
-
             if self.arm_future is None or not self.arm_future.done():
                 return
 
