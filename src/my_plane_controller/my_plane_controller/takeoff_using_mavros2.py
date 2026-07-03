@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 
@@ -84,7 +86,7 @@ class PlaneMission(Node):
     # mission builder
     # -------------------------
     def build_mission(self):
-        alt = 100.0
+        alt = 25.0
 
         p0 = (0, 0)
         p1 = (100, 0)
@@ -108,8 +110,8 @@ class PlaneMission(Node):
             self.create_wp(lat2, lon2, alt, 16),
             self.create_wp(latc, lonc, alt, 16),
             self.create_wp(lat3, lon3, alt, 16),
-            self.create_wp(lat4, lon4, alt, 21),
-            self.create_wp(lat5, lon5, alt, 16),
+            self.create_wp(lat4, lon4, alt, 16),
+            self.create_wp(lat5, lon5, 0.0, 21),
         ]
 
         self.mission[0].is_current = True

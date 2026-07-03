@@ -188,26 +188,6 @@ class KamikazeMissionControl(Node):
         lon = self.home_lon + (dx / (111111.0 * math.cos(math.radians(self.home_lat + 1e-6))))
         return lat, lon
     
-    # def send_guided_goto(self, lat, lon, alt=0.0):
-    #     req = CommandInt.Request()
-
-    #     req.broadcast = False
-    #     req.frame = 6  # MAV_FRAME_GLOBAL_RELATIVE_ALT
-
-    #     req.current = 2
-    #     req.autocontinue = True
-
-    #     req.param1 = -1.0
-    #     req.param2 = 0.0
-    #     req.param3 = 0.0
-    #     req.param4 = float('nan')
-
-    #     req.x = int(lat * 1e7)
-    #     req.y = int(lon * 1e7)
-    #     req.z = float(alt)
-
-    #     self.command_int_client.call_async(req)
-
     def send_guided_goto(self, lat, lon, alt=0.0):
         req = CommandInt.Request()
 
