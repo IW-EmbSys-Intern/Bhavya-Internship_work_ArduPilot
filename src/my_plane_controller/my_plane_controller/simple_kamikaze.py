@@ -230,7 +230,7 @@ class KamikazeMissionControl(Node):
         return wp
 
     def build_search_mission(self):
-        alt = 25.0  
+        alt = 50.0  
         p_takeoff = (0, 0)
         # p_search1 = (50, 800)
         # p_search2 = (200, 200)
