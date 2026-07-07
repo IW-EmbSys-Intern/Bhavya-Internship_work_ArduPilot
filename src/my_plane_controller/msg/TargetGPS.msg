@@ -1,0 +1,4 @@
+string class_name
+float32 confidence
+float64 latitude
+float64 longitude

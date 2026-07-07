@@ -12,10 +12,13 @@ endif()
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(std_msgs REQUIRED)
 
 # 1. Generate the Custom Messages
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TargetDetection.msg"
+  "msg/TargetGPS.msg"
+  DEPENDENCIES std_msgs
 )
 
 # 2. Correctly install the Python package directory 
@@ -28,6 +31,7 @@ install(DIRECTORY ${PROJECT_NAME}
 # Make sure these filenames match your actual python script names!
 install(PROGRAMS
   ${PROJECT_NAME}/yolo_node.py
+  ${PROJECT_NAME}/geolocator_node.py
   ${PROJECT_NAME}/yolo_sample.py
   ${PROJECT_NAME}/kamikaze.py
   ${PROJECT_NAME}/simple_kamikaze.py

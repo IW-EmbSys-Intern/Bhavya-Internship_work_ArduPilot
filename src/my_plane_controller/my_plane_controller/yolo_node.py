@@ -108,12 +108,12 @@ class YoloTargetDetector(Node):
         if self.frame_count % self.infer_every_n_frames != 0:
             return
 
-        # --------- ALTITUDE GATE ----------
-        if self.current_altitude < self.activation_threshold:
-            if self.window_visible:
-                cv2.destroyAllWindows()
-                self.window_visible = False
-            return
+        # # --------- ALTITUDE GATE ----------
+        # if self.current_altitude < self.activation_threshold:
+        #     if self.window_visible:
+        #         cv2.destroyAllWindows()
+        #         self.window_visible = False
+        #     return
 
         # --------- CONVERT IMAGE ----------
         try:
@@ -176,8 +176,10 @@ class YoloTargetDetector(Node):
                         detection_msg.target_found = True
                         detection_msg.pixel_x = float(pixel_x)
                         detection_msg.pixel_y = float(pixel_y)
-                        detection_msg.gps_lat = self.current_lat
-                        detection_msg.gps_lon = self.current_lon
+                        # detection_msg.gps_lat = self.current_lat
+                        # detection_msg.gps_lon = self.current_lon
+                        detection_msg.class_name = cls_name
+                        detection_msg.confidence = conf
 
                         self.target_pub.publish(detection_msg)
 
