@@ -392,7 +392,11 @@ class GeolocatorNode(Node):
             lon = self.aircraft_lon
             sync_note = ' [unsynced: no header.stamp on TargetDetection - see README]'
 
-        result = self.pixel_to_gps(msg.pixel_x, msg.pixel_y, pos, R, lat, lon)
+        # zoom_factor defaults to 1.0 for backward compatibility with older
+        # bags/messages that predate this field.
+        zoom_factor = float(getattr(msg, 'zoom_factor', 1.0)) or 1.0
+
+        result = self.pixel_to_gps(msg.pixel_x, msg.pixel_y, pos, R, lat, lon, zoom_factor)
         if result is None:
             self.get_logger().warn(
                 'Ray from pixel (%.1f, %.1f) does not intersect the ground plane '
@@ -418,7 +422,7 @@ class GeolocatorNode(Node):
     # -------------------------------------------------------------------
     def pixel_to_gps(self, u: float, v: float, aircraft_pos_enu: np.ndarray,
                       R_map_from_body: np.ndarray, aircraft_lat: float,
-                      aircraft_lon: float) -> Optional[tuple]:
+                      aircraft_lon: float, zoom_factor: float = 1.0) -> Optional[tuple]:
         """Project a pixel coordinate onto the ground plane and return
         (lat, lon), or None if the ray does not hit the ground in front
         of the aircraft.
@@ -428,10 +432,25 @@ class GeolocatorNode(Node):
         specific detection -- passed in explicitly rather than read from
         `self` so the caller controls exactly which synchronized sample
         is used (see detection_cb).
+
+        zoom_factor accounts for any digital crop+resize ("zoom") applied
+        to the frame upstream (in yolo_node.py) BEFORE running detection.
+        Cropping to the center 1/zoom_factor of the frame and resizing
+        back up increases the effective focal length by zoom_factor while
+        leaving the principal point unchanged (crop is centered), so
+        fx/fy from camera_info -- which describe the RAW, un-zoomed
+        camera -- must be scaled up by zoom_factor to correctly interpret
+        pixel coordinates measured on the zoomed frame. Skipping this
+        silently under-corrects the ray angle for any off-center
+        detection and is a systematic (not random) source of ground
+        position error that grows with distance from the image center.
         """
+        fx = self.fx * zoom_factor
+        fy = self.fy * zoom_factor
+
         # 1) Pixel -> normalized ray in the camera OPTICAL frame.
-        x_n = (u - self.cx) / self.fx
-        y_n = (v - self.cy) / self.fy
+        x_n = (u - self.cx) / fx
+        y_n = (v - self.cy) / fy
         ray_optical = np.array([x_n, y_n, 1.0], dtype=np.float64)
 
         # 2) Optical frame -> camera LINK frame (fixed axis convention).
@@ -468,7 +487,8 @@ class GeolocatorNode(Node):
             self.get_logger().info(
                 '\n--- geolocation debug ---\n'
                 'pixel: u=%.2f v=%.2f\n'
-                'intrinsics: fx=%.3f fy=%.3f cx=%.2f cy=%.2f (camera_info_received=%s)\n'
+                'intrinsics (raw): fx=%.3f fy=%.3f cx=%.2f cy=%.2f (camera_info_received=%s)\n'
+                'zoom_factor=%.3f -> intrinsics (effective): fx=%.3f fy=%.3f\n'
                 'ray_optical=%s\nray_link=%s\nray_body=%s\nray_world=%s\n'
                 'aircraft_pos_enu(x=E,y=N,z=U)=%s\n'
                 'aircraft roll/pitch/yaw (deg) = %.2f / %.2f / %.2f\n'
@@ -477,6 +497,7 @@ class GeolocatorNode(Node):
                 'ground_point_world(E,N,U)=%s\n'
                 'aircraft (synced) lat/lon = %.7f, %.7f'
                 % (u, v, self.fx, self.fy, self.cx, self.cy, self.camera_info_received,
+                   zoom_factor, fx, fy,
                    ray_optical, ray_link, ray_body, ray_world,
                    aircraft_pos_enu,
                    math.degrees(roll), math.degrees(pitch), math.degrees(yaw),
@@ -504,7 +525,8 @@ class GeolocatorNode(Node):
             self.get_logger().info(
                 '--- geolocation debug ---\n'
                 f'  pixel (u,v)            = ({u:.2f}, {v:.2f})\n'
-                f'  intrinsics fx,fy,cx,cy = ({self.fx:.3f}, {self.fy:.3f}, {self.cx:.3f}, {self.cy:.3f})\n'
+                f'  intrinsics raw fx,fy,cx,cy = ({self.fx:.3f}, {self.fy:.3f}, {self.cx:.3f}, {self.cy:.3f})\n'
+                f'  zoom_factor = {zoom_factor:.3f} -> effective fx,fy = ({fx:.3f}, {fy:.3f})\n'
                 f'  ray_optical             = {ray_optical}\n'
                 f'  ray_link                = {ray_link}\n'
                 f'  ray_body                = {ray_body}\n'
