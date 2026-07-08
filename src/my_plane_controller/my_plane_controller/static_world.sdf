@@ -1,0 +1,216 @@
+<sdf version='1.10'>
+  <world name='runway'>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
+    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'/>
+    
+    <plugin
+        filename="libSquareMover.so"
+        name="square_mover">
+      <model_name>Ambulance2_22</model_name>
+      <side_length>10</side_length>
+      <speed>5.0</speed>
+    </plugin>
+
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0.800000012 0.800000012 0.800000012 1</background>
+      <sky/>
+      <shadows>true</shadows>
+    </scene>
+    <gravity>0 0 -9.8000000000000007</gravity>
+    <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <include>
+      <uri>file:///home/indowings24/ardupilot_gazebo/models/runway</uri>
+      <name>runway</name>
+      <pose>-29 545 0 0 0 0.052359877559829952</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/SITL_Models/Gazebo/models/skywalker_x8</uri>
+      <name>skywalker_x8</name>
+      <pose>1.5020300919745682 -0.38318119076349422 0.16999901272263673 1.0994516356377402e-07 7.8982171887911967e-07 1.6120446682100058</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2</name>
+      <pose>244.94402961908617 709.31712374043184 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_0</name>
+      <pose>152.58480699810113 807.77244455414495 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_1</name>
+      <pose>338.97483142317236 803.8090987256993 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_2</name>
+      <pose>419.54556578821143 714.08147178912168 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_3</name>
+      <pose>381.03045190329135 750.9843391360713 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_4</name>
+      <pose>275.1867522620085 752.91251977789489 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_5</name>
+      <pose>124.6791473735563 765.57076022846218 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_6</name>
+      <pose>199.89399719238281 888.384765625 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_7</name>
+      <pose>36.860858321943837 777.0446393447952 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_8</name>
+      <pose>93.30682426453123 867.13389884417825 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_9</name>
+      <pose>73.410733268658348 709.83799674957186 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_10</name>
+      <pose>220.20516491093733 785.15850305557251 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_11</name>
+      <pose>290.23749939061901 855.49715921861002 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_12</name>
+      <pose>166.60009953004464 707.39134446811318 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_13</name>
+      <pose>325.82178958503061 669.72870551524238 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_14</name>
+      <pose>138.44110997132262 627.0336194105621 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_15</name>
+      <pose>255.3511839542478 614.91154479980469 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_16</name>
+      <pose>380.79414382336677 605.40415918235738 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_17</name>
+      <pose>455.59118513081262 649.34529689855765 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_18</name>
+      <pose>65.863699596887415 633.76098781993812 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_19</name>
+      <pose>72.904660604519734 556.12220064823441 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_20</name>
+      <pose>186.37521338088467 557.94141291996084 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_21</name>
+      <pose>304.91322095290064 549.28389124577734 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_22</name>
+      <pose>408.05573570854239 535.38144030787794 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_23</name>
+      <pose>381.49905144333775 -86.547500052962477 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_24</name>
+      <pose>228.94914715983847 -132.90945422226574 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_25</name>
+      <pose>175.2607492845928 -93.048908994770713 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_26</name>
+      <pose>131.06194746634242 -165.0033200604289 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_27</name>
+      <pose>178.50878038697729 -224.71741823067313 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_28</name>
+      <pose>88.439894878883209 -233.05407584085296 0 0 0 0</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2_29</name>
+      <pose>66.968629386468848 307.84251100691148 0 0 0 0</pose>
+    </include>
+    <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
+      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+      <specular>0.800000012 0.800000012 0.800000012 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <linear>0.01</linear>
+        <constant>0.90000000000000002</constant>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+  </world>
+</sdf>
