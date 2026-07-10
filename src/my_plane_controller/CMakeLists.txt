@@ -30,9 +30,9 @@ install(DIRECTORY ${PROJECT_NAME}
 # 3. Install your executable scripts (YOLO & Flight Node)
 # Make sure these filenames match your actual python script names!
 install(PROGRAMS
-  ${PROJECT_NAME}/yolo_node.py
-  ${PROJECT_NAME}/geolocator_node.py
   ${PROJECT_NAME}/yolo_sample.py
+  ${PROJECT_NAME}/yolo_static_node.py
+  ${PROJECT_NAME}/geolocator_node.py
   ${PROJECT_NAME}/kamikaze.py
   ${PROJECT_NAME}/simple_kamikaze.py
   ${PROJECT_NAME}/square.py

@@ -1,0 +1,16 @@
+I’m working with ArduPlane SITL using MAVROS (ROS2). I want a clear explanation of the MAVLink command MAV_CMD_NAV_TAKEOFF.
+
+Please explain:
+
+What exactly MAV_CMD_NAV_TAKEOFF is in MAVLink/ArduPilot terms
+Whether it is a mode, command, or mission item
+How it behaves in ArduPlane AUTO mode step-by-step
+How the autopilot executes it (throttle, pitch, altitude handling)
+Why it is mainly used in missions instead of GUIDED mode
+The difference between:
+TAKEOFF mode (ArduPlane flight mode)
+AUTO mission takeoff (MAV_CMD_NAV_TAKEOFF)
+GUIDED mode control
+Common misconceptions about using it like Copter-style offboard takeoff
+
+Keep the explanation simple, structured, and focused on ArduPlane fixed-wing behavior.

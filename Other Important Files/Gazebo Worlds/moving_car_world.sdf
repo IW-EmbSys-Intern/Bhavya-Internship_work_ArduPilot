@@ -1,0 +1,66 @@
+<sdf version='1.10'>
+  <world name='runway'>
+    <plugin name='gz::sim::systems::Physics' filename='gz-sim-physics-system'/>
+    <plugin name='gz::sim::systems::UserCommands' filename='gz-sim-user-commands-system'/>
+    <plugin name='gz::sim::systems::SceneBroadcaster' filename='gz-sim-scene-broadcaster-system'/>
+    <plugin name='gz::sim::systems::Imu' filename='gz-sim-imu-system'/>
+    <plugin name='gz::sim::systems::Sensors' filename='gz-sim-sensors-system'/>
+
+    <plugin name="SquareMover"
+        filename="libSquareMover.so">
+    <model_name>Ambulance2</model_name>
+    <speed>5</speed>
+    <side_length>100</side_length>
+    </plugin>
+
+
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0.800000012 0.800000012 0.800000012 1</background>
+      <sky/>
+      <shadows>true</shadows>
+    </scene>
+    <gravity>0 0 -9.8000000000000007</gravity>
+    <magnetic_field>5.5644999999999998e-06 2.2875799999999999e-05 -4.2388400000000002e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <include>
+      <uri>file:///home/indowings24/ardupilot_gazebo/models/runway</uri>
+      <name>runway</name>
+      <pose>-29 545 0 0 0 0.052359877559829945</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/SITL_Models/Gazebo/models/skywalker_x8</uri>
+      <name>skywalker_x8</name>
+      <pose>8.6478977153309859e-10 -8.665399495988371e-09 0.16999914088406617 -3.83969697432104e-11 -1.7214491799184883e-09 1.5707963205264763</pose>
+    </include>
+    <include>
+      <uri>file:///home/indowings24/.gz/fuel/fuel.gazebosim.org/openrobotics/models/ambulance2/2</uri>
+      <name>Ambulance2</name>
+      <pose>58.683459926329355 105.91051478210406 -0.0074393798953638632 -1.9120838476693978e-17 -1.3564434699495969e-09 -3.408308148188962e-21</pose>
+    </include>
+    <light name='sun' type='directional'>
+      <pose>0 0 10 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>-0.5 0.10000000000000001 -0.90000000000000002</direction>
+      <diffuse>0.800000012 0.800000012 0.800000012 1</diffuse>
+      <specular>0.800000012 0.800000012 0.800000012 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <linear>0.01</linear>
+        <constant>0.90000000000000002</constant>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+  </world>
+</sdf>

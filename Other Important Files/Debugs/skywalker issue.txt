@@ -1,0 +1,92 @@
+What Went Wrong and How We Fixed It — Your Notes
+Problem 1: Wrong SITL backend (--model gazebo)
+The old --model gazebo flag uses a UDP binary protocol from the classic Gazebo (Gazebo 9/11 era). Gazebo Harmonic (gz-sim 8) uses a completely different internal architecture. The correct flag is --model JSON which uses the JSON SITL interface that the ardupilot_gazebo plugin speaks.
+Problem 2: ardupilot_gazebo plugin not installed correctly
+The repo was cloned and built but the .so files were sitting in the build/ directory. The CMakeLists.txt install target created the directory /usr/local/lib/ardupilot_gazebo/ but didn't copy the .so files into a plugins/ subdirectory. We manually copied them with sudo cp.
+Problem 3: Broken .bashrc
+GZ_SIM_SYSTEM_PLUGIN_PATH was pointing to the build directory (which worked accidentally) but there was also a syntax error where two export statements were fused onto one line with no newline, causing one of them to silently fail. The resource paths were also duplicated and conflicting. We rewrote the Gazebo section cleanly.
+Problem 4: Wrong world (PX4's baylands.sdf)
+You were launching PX4's baylands.sdf which has no ArduPilot plugin block in it. Even if the plugin .so is on the path, Gazebo only loads it if the SDF world file explicitly references it. skywalker_x8_runway.sdf from the SITL_Models repo has the plugin correctly configured for the aircraft.
+Problem 5: Wrong SITL frame (-f flag missing)
+Without -f gazebo-zephyr, SITL doesn't know the flight dynamics model to use for a fixed-wing in Gazebo. It defaults to something incompatible, so even if the connection was established, the physics would be wrong or the port mapping would mismatch.
+Root cause summary
+SITL and Gazebo communicate over UDP port 9002 (Gazebo → SITL sensor data) and 9003 (SITL → Gazebo actuator commands). The ardupilot_gazebo plugin handles this. Without the plugin loaded in the correct world, Gazebo sends nothing on 9002, so SITL sees no sensor data, sends no commands, and reports link 1 down even though MAVProxy itself connects fine (MAVProxy connects to SITL via TCP 5760, which is separate).
+
+Why gazebo-zephyr?When you run sim_vehicle.py, the -f flag tells ArduPilot which parameter set and physics profile to load. gazebo-zephyr is simply the closest available fixed-wing frame profile that is pre-tuned to work with the JSON/Gazebo backend. It's not about the Zephyr model specifically — it just means "use fixed-wing parameters compatible with Gazebo Harmonic." There's no gazebo-skywalker frame, so we borrow zephyr's. The actual 3D model and aerodynamics come from the SDF file in Gazebo — SITL just needs to know it's a fixed-wing.Why skywalker doesn't take off but vtail doesThe skywalker_x8 is a flying wing — no fuselage, no tail, elevons only. Its SDF aerodynamics need more speed to generate lift and its control surface config is different. The "rectangles on ground" behavior means it's in TAKEOFF mode, gaining speed, but the lift coefficient in the SDF isn't generating enough force at that speed, or the elevons aren't deflecting correctly because the gazebo-zephyr parameter set doesn't match a flying wing geometry. This is a model tuning issue, not a connection issue. The vtail is a conventional aircraft and matches the zephyr profile closely, so it just works.
+
+
+
+
+What Went Wrong and How We Fixed It — Takeoff Issue
+Problem 1: Wrong parameter file for a flying wing (gazebo-zephyr.parm)
+The gazebo-zephyr frame is tuned for a conventional aircraft with a tail. The skywalker x8 is a flying wing — it has no tail, no rudder, no elevator. All pitch and roll control comes from the two elevons (combined elevator + aileron surfaces). Using zephyr's default params meant the elevon mixing, servo functions, and takeoff thresholds were all wrong for this geometry.
+Problem 2: Channel mismatch between SDF and ArduPilot
+The SDF model explicitly defines:
+
+Channel 0 → left elevon → must be SERVO1 with function 77
+Channel 1 → right elevon → must be SERVO2 with function 78
+Channel 2 → throttle → must be SERVO3 with function 70
+
+The plane-elevons.parm file had SERVO1 and SERVO2 swapped (78 and 77 instead of 77 and 78), meaning roll commands would go to the wrong elevon, causing the aircraft to roll the wrong way and veer off the runway instead of climbing.
+Problem 3: Throttle trim not set correctly
+SERVO3_TRIM=1000 is critical for throttle on a fixed wing. If trim is 1500 (the default), ArduPilot thinks neutral throttle is mid-stick, which means it sends 50% throttle even at zero command. Setting trim to 1000 means zero throttle = minimum PWM = motor off. Without this the throttle mapping is completely wrong.
+Problem 4: Takeoff airspeed thresholds too high
+TKOFF_THR_MINSPD=8 and TKOFF_ROTATE_SPD=12 were set expecting real-world aerodynamics. In Gazebo, the lift-drag coefficients in the SDF don't perfectly match reality, so the aircraft needs to hit rotate speed before ArduPilot commits to the climb. The Gazebo physics couldn't accelerate the 4.5kg skywalker fast enough to hit those thresholds within the timeout window, causing repeated Timeout AUTO messages. Setting TKOFF_THR_MINSPD=0 tells ArduPilot to skip the speed check and go straight to full throttle and rotate.
+Root cause summary
+Flying wings require elevon mixing (ELEVON_OUTPUT, ELEVON_MIXING) which tells ArduPilot to combine pitch and roll commands into elevon deflections instead of sending them to separate elevator and aileron servos. Without this, pitch and roll commands go to the wrong places or cancel each other out. We solved everything by creating a dedicated gazebo-skywalker.parm file that correctly maps all three channels to match the SDF, enables elevon mixing, disables the airspeed sensor (not modelled in the SDF), and lowers takeoff thresholds to match Gazebo's physics.
+
+
+
+
+
+
+
+
+    <link name="camera_link">
+      <!-- 📍 Position: under nose -->
+      <pose>0.35 0 -0.10 0 0.785 0</pose>
+      <!-- x forward | y center | z down | pitch = 0.785 rad = 45 degrees downward -->
+
+      <!-- optional visible marker -->
+      <visual name="camera_visual">
+        <geometry>
+          <box>
+            <size>0.05 0.08 0.03</size>
+          </box>
+        </geometry>
+
+        <material>
+          <ambient>1 0 0 1</ambient>
+          <diffuse>1 0 0 1</diffuse>
+          <emissive>0.5 0 0 1</emissive>
+        </material>
+      </visual>
+
+      <sensor name="front_camera" type="camera">
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <!-- try 20 for better fps -->
+        <visualize>true</visualize>
+
+        <camera>
+          <horizontal_fov>1.2</horizontal_fov>
+
+          <image>
+            <width>1280</width>
+            <!-- 640 X 480 for better fps -->
+            <height>720</height>
+            <format>R8G8B8</format>
+          </image>
+
+          <clip>
+            <near>0.1</near>
+            <far>2000</far>
+          </clip>
+        </camera>
+      </sensor>
+    </link>
+
+    <joint name="camera_joint" type="fixed">
+      <parent>base_link</parent>
+      <child>camera_link</child>
+    </joint>
