@@ -12,3 +12,5 @@ __pycache__
 microsoft.gpg
 __pycache__/
 *.pyc
+gazebo_models_iris_with_gimbal_I1
+gazebo_models_iris_with_gimbal_I1/
