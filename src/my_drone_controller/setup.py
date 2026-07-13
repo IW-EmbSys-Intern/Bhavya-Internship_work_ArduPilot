@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            "tracking = my_drone_controller.vehicle_detecting:main"
         ],
     },
 )

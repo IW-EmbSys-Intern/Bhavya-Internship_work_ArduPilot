@@ -38,3 +38,6 @@ SERVO9_FUNCTION  8
 SERVO10_FUNCTION 7
 # Mount1Yaw
 SERVO11_FUNCTION 6
+
+# Waypoint behavior: 1 = Face next waypoint during transit
+WP_YAW_BEHAVIOR  1
