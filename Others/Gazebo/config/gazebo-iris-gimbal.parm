@@ -8,8 +8,8 @@ MOT_PWM_MAX      1900
 
 # Servo gimbal on mount 1 has 3 DOF
 MNT1_TYPE        1
-MNT1_PITCH_MAX   45
-MNT1_PITCH_MIN   -135
+MNT1_PITCH_MAX   45   #responsible for initial angle also
+MNT1_PITCH_MIN   -135 #responsible for initial angle also
 MNT1_ROLL_MAX    30
 MNT1_ROLL_MIN    -30
 MNT1_YAW_MAX     160
@@ -20,17 +20,17 @@ RC6_MAX          1900
 RC6_MIN          1100
 
 # Mount1 Roll
-RC6_OPTION       212
+RC6_OPTION       0
 
 # Mount1 Pitch
 RC7_MAX          1900
 RC7_MIN          1100
-RC7_OPTION       213
+RC7_OPTION       0
 
 # Mount1 Yaw
 RC8_MAX          1900
 RC8_MIN          1100
-RC8_OPTION       214
+RC8_OPTION       0
 
 # Mount1Roll
 SERVO9_FUNCTION  8

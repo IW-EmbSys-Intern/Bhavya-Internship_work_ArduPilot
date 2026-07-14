@@ -13,7 +13,7 @@
     <side_length>100</side_length>
     </plugin>
 
-
+ 
     <scene>
       <ambient>1 1 1 1</ambient>
       <background>0.800000012 0.800000012 0.800000012 1</background>

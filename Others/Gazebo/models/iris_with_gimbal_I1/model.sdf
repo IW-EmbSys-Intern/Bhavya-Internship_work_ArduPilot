@@ -6,9 +6,11 @@
     </include>
 
     <include>
-      <uri>model://gimbal_small_3d</uri>
+      <!-- <uri>model://gimbal_small_3d</uri> -->
+      <uri>file:///home/indowings24/ardupilot_ros2_ws/Others/Gazebo/models/gimbal_small_3d</uri>
       <name>gimbal</name>
-      <pose degrees="true">0 -0.01 -0.124923 90 0 90</pose>    
+      <pose degrees="true">0 -0.01 -0.124923 90 0 90</pose>
+       
     </include>
 
     <joint name="gimbal_joint" type="revolute">
