@@ -75,7 +75,7 @@ class GuidedMissionNode(Node):
 
         self.declare_parameter(
             "target_alt",
-            50.0
+            30.0
         )
 
         self.declare_parameter(

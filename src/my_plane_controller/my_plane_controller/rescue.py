@@ -14,9 +14,9 @@ from my_plane_controller.msg import TargetDetection, TargetGPS
 from my_drone_controller.msg import TargetDetectionDrone, TargetGPSDrone
 
 
-class KamikazeMissionControl(Node):
+class rescueMissionControl(Node):
     def __init__(self):
-        super().__init__('kamikaze_mission_control')
+        super().__init__('rescue_mission_control')
 
         # ---------- MAVROS Service Clients ----------
         self.arm_client = self.create_client(CommandBool, '/plane/mavros/cmd/arming')
@@ -39,9 +39,9 @@ class KamikazeMissionControl(Node):
         self.yolo_sub = self.create_subscription(TargetGPSDrone, '/detection/target_gps', self.yolo_callback, 10)
         self.camera_info_sub = self.create_subscription(CameraInfo, "/camera/camera_info", self.camera_info_cb, 10)
         self.local_pos_sub = self.create_subscription(
-            PoseStamped, '/plane/mavros/local_position/pose', self.local_pos_cb, qos_profile=qos_profile_sensor_data)
+            PoseStamped, '/mavros/local_position/pose', self.local_pos_cb, qos_profile=qos_profile_sensor_data)
         self.global_gps_sub = self.create_subscription(
-            NavSatFix, '/plane/mavros/global_position/global', self.global_gps_cb, qos_profile=qos_profile_sensor_data)
+            NavSatFix, '/mavros/global_position/global', self.global_gps_cb, qos_profile=qos_profile_sensor_data)
         
 
         # ---------- State machine ----------
@@ -74,7 +74,7 @@ class KamikazeMissionControl(Node):
         # Terminal-phase bookkeeping
         self.terminal_speed_sent = False
         self.PHASE_B_RANGE_M = 40.0     # switch to terminal/forced-speed inside this range
-        self.IMPACT_RANGE_M = 3.0       # trigger pull-up inside this range
+        self.rescue2_RANGE_M = 3.0       # trigger pull-up inside this range
         self.CRUISE_SPEED_MPS = 18.0
         self.TERMINAL_SPEED_MPS = 10.0
 
@@ -86,7 +86,7 @@ class KamikazeMissionControl(Node):
         self.home_lat = -35.36325846
         self.home_lon = 149.16523276
 
-        self.get_logger().info("🛫 Kamikaze Controller waiting for MAVROS services...")
+        self.get_logger().info("🛫 rescue Controller waiting for MAVROS services...")
         self.arm_client.wait_for_service()
         self.mode_client.wait_for_service()
         self.wp_clear_client.wait_for_service()
@@ -307,8 +307,8 @@ class KamikazeMissionControl(Node):
                 self.set_speed(self.TERMINAL_SPEED_MPS)
                 self.terminal_speed_sent = True
 
-        if r < self.IMPACT_RANGE_M:
-            self.get_logger().warn(f"💥 IMPACT RANGE (range={r:.1f} m) — pulling up")
+        if r < self.rescue2_RANGE_M:
+            self.get_logger().warn(f"💥 RESCUE2 RANGE (range={r:.1f} m) — pulling up")
             self.step = 7
 
     # ---------------- 1 Hz state machine ----------------
@@ -410,7 +410,7 @@ class KamikazeMissionControl(Node):
                 req.custom_mode = "GUIDED"
                 self.mode_client.call_async(req)
                 return
-            self.get_logger().info("GUIDED confirmed. Sending initial reposition + entering intercept.")
+            self.get_logger().info("GUIDED confirmed. Sending initial reposition + entering rescue.")
             if self.target_lat is not None:
                 self.send_guided_goto(self.target_lat, self.target_lon, self.target_alt)
                 # self.set_speed(self.CRUISE_SPEED_MPS)
@@ -422,10 +422,10 @@ class KamikazeMissionControl(Node):
 
         # STEP 6.1: Committed intercept — all real work happens in fast_tracking_loop()
         if self.step == 6.1:
-            self.get_logger().info("🎯 Intercepting target...", throttle_duration_sec=2.0)
+            self.get_logger().info("🎯 Rescuing Humans...", throttle_duration_sec=2.0)
             return
 
-        # STEP 7: Pull-up after impact range reached
+        # STEP 7: Pull-up after rescue range reached
         if self.step == 7:
             self.get_logger().warn("Executing pull-up / RTL.")
             req = SetMode.Request()
@@ -442,7 +442,7 @@ class KamikazeMissionControl(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = KamikazeMissionControl()
+    node = rescueMissionControl()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
